@@ -2,8 +2,14 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import type { NextRequest } from "next/server"
 
+const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
+
 export default async function middleware(req: NextRequest) {
-    const sessionResponse = await auth.handler(new Request("http://localhost", { 
+    if (!BETTER_AUTH_URL) {
+        throw new Error("BETTER_AUTH_URL is not defined")
+    }
+    
+    const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
         headers: Object.fromEntries(req.headers.entries())
     }))
     const session = await sessionResponse.json()

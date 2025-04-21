@@ -8,10 +8,16 @@ import { todos, insertTodoSchema } from "@/database/schema"
 import { ZodError } from "zod"
 import { headers } from "next/headers"
 
+const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
+
 export async function createTodo(formData: FormData) {
+    if (!BETTER_AUTH_URL) {
+        throw new Error("BETTER_AUTH_URL is not defined")
+    }
+    
     try {
         const headersList = await headers()
-        const sessionResponse = await auth.handler(new Request("http://localhost", { 
+        const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
             headers: Object.fromEntries(headersList.entries())
         }))
         const session = await sessionResponse.json()
@@ -46,13 +52,17 @@ export async function createTodo(formData: FormData) {
 }
 
 export async function toggleTodo(id: string) {
+    if (!BETTER_AUTH_URL) {
+        throw new Error("BETTER_AUTH_URL is not defined")
+    }
+    
     try {
         if (!id) {
             return { success: false, error: "Missing todo ID" }
         }
         
         const headersList = await headers()
-        const sessionResponse = await auth.handler(new Request("http://localhost", { 
+        const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
             headers: Object.fromEntries(headersList.entries())
         }))
         const session = await sessionResponse.json()
@@ -88,9 +98,13 @@ export async function toggleTodo(id: string) {
 }
 
 export async function deleteTodo(formData: FormData) {
+    if (!BETTER_AUTH_URL) {
+        throw new Error("BETTER_AUTH_URL is not defined")
+    }
+    
     try {
         const headersList = await headers()
-        const sessionResponse = await auth.handler(new Request("http://localhost", { 
+        const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
             headers: Object.fromEntries(headersList.entries())
         }))
         const session = await sessionResponse.json()

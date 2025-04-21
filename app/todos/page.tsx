@@ -5,11 +5,15 @@ import { todos } from "@/database/schema"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
-const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || "https://your-auth-domain.com"
+const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
 
 export const dynamic = 'force-dynamic'
 
 export default async function TodosPage() {
+    if (!BETTER_AUTH_URL) {
+        throw new Error("BETTER_AUTH_URL is not defined")
+    }
+    
     const headersList = await headers()
     const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
         headers: Object.fromEntries(headersList.entries())
