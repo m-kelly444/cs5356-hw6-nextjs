@@ -5,8 +5,14 @@ import { nextCookies } from "better-auth/next-js"
 import { db } from "@/database/db"
 import * as schema from "@/database/schema"
 
-const baseUrl = process.env.BETTER_AUTH_URL || 
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+const ensureHttps = (url: string | undefined): string | undefined => {
+  if (!url) return undefined;
+  return url.startsWith('http') ? url : `https://${url}`;
+};
+
+const baseUrl = process.env.BETTER_AUTH_URL || (
+  process.env.VERCEL_URL ? ensureHttps(process.env.VERCEL_URL) : undefined
+);
 
 export const auth = betterAuth({
     baseUrl,
@@ -28,7 +34,7 @@ export const auth = betterAuth({
         baseUrl,
         "http://localhost:3000",
         "https://cs5356-hw6-nextjs.vercel.app"
-    ].filter((url): url is string => !!url),
+    ].filter((url): url is string => url !== undefined),
     plugins: [
         nextCookies()
     ]
