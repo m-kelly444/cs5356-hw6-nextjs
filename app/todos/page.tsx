@@ -5,17 +5,26 @@ import { todos } from "@/database/schema"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
+const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || "https://your-auth-domain.com"
+
 export const dynamic = 'force-dynamic'
 
 export default async function TodosPage() {
     const headersList = await headers()
-    const sessionResponse = await auth.handler(new Request("http://localhost", { 
+    const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
         headers: Object.fromEntries(headersList.entries())
     }))
-    const session = await sessionResponse.json()
+
+    let session;
+    try {
+        session = await sessionResponse.json()
+    } catch (error) {
+        console.error("Failed to parse session response:", error);
+        return <div>Authentication error. Please try again later.</div>
+    }
     
     if (!session) {
-        return null
+        return <div>Please sign in to view your todos</div>
     }
     
     const userTodos = await db.query.todos.findMany({
