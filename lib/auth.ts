@@ -10,11 +10,12 @@ const ensureHttps = (url: string | undefined): string | undefined => {
   return url.startsWith('http') ? url : `https://${url}`;
 };
 
-const deploymentUrl = process.env.VERCEL_URL 
-  ? ensureHttps(process.env.VERCEL_URL)
-  : process.env.BETTER_AUTH_URL;
+const baseUrl = process.env.BETTER_AUTH_URL || (
+  process.env.VERCEL_URL ? ensureHttps(process.env.VERCEL_URL) : undefined
+);
 
 export const auth = betterAuth({
+    baseUrl,
     database: drizzleAdapter(db, {
         provider: "pg",
         usePlural: true,
@@ -30,8 +31,7 @@ export const auth = betterAuth({
         enabled: true
     },
     trustedOrigins: [
-        deploymentUrl,
-        process.env.BETTER_AUTH_URL,
+        baseUrl,
         "http://localhost:3000",
         "https://cs5356-hw6-nextjs.vercel.app"
     ].filter((url): url is string => url !== undefined),
