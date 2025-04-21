@@ -5,8 +5,13 @@ import { nextCookies } from "better-auth/next-js"
 import { db } from "@/database/db"
 import * as schema from "@/database/schema"
 
+const ensureHttps = (url: string | undefined): string | undefined => {
+  if (!url) return undefined;
+  return url.startsWith('http') ? url : `https://${url}`;
+};
+
 const deploymentUrl = process.env.VERCEL_URL 
-  ? `https://${process.env.VERCEL_URL}` 
+  ? ensureHttps(process.env.VERCEL_URL)
   : process.env.BETTER_AUTH_URL;
 
 export const auth = betterAuth({
