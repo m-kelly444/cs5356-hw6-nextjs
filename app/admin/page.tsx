@@ -1,16 +1,23 @@
 import { desc } from "drizzle-orm"
-
+import { auth } from "@/lib/auth"
 import { db } from "@/database/db"
 import { todos } from "@/database/schema"
-
 import { Button } from "@/components/ui/button"
 import { deleteTodo } from "@/actions/todos"
+import { headers } from "next/headers"
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
+    const headersList = await headers()
+    const sessionResponse = await auth.handler(new Request("http://localhost", { 
+        headers: Object.fromEntries(headersList.entries())
+    }))
+    const session = await sessionResponse.json()
     
-    /* YOUR AUTHORIZATION CHECK HERE */
+    if (!session || session.user.role !== "admin") {
+        return null
+    }
 
     const allTodos = await db.query.todos.findMany({
         with: {
@@ -45,10 +52,12 @@ export default async function AdminPage() {
                             )}
                             {allTodos.map((todo) => (
                                 <tr key={todo.id} className="border-t">
-                                    <td className="py-2 px-4">{todo.user.name}</td>
+                                    <td className="py-2 px-4">{todo.user?.name || 'Unknown'}</td>
                                     <td className="py-2 px-4">{todo.title}</td>
                                     <td className="py-2 px-4 text-center">
-                                        <form action={deleteTodo}>
+                                        <form action={async (formData) => {
+                                            await deleteTodo(formData)
+                                        }}>
                                             <input type="hidden" name="id" value={todo.id} />
                                             <Button
                                                 variant="destructive"
@@ -67,4 +76,4 @@ export default async function AdminPage() {
             </section>
         </main>
     )
-} 
+}

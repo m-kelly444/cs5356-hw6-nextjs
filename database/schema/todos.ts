@@ -1,10 +1,8 @@
 import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
-
 import { users } from "./auth"
 import { relations } from "drizzle-orm"
 import { createSelectSchema, createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
-
 
 export const todos = pgTable("todos", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -28,7 +26,6 @@ export const todosRelations = relations(todos, ({ one }) => ({
     }),
 }))
 
-
 export const selectUserSchema = createSelectSchema(users);
 export type User = z.infer<typeof selectUserSchema>;
 
@@ -36,11 +33,11 @@ export const selectTodoSchema = createSelectSchema(todos);
 export type Todo = z.infer<typeof selectTodoSchema>;
 
 export const insertTodoSchema = createInsertSchema(todos, {
-  title: (schema: z.ZodString) => schema.nonempty("Title cannot be empty"),
+    title: (schema) => schema.trim().nonempty("Title cannot be empty"),
 })
 export type NewTodo = z.infer<typeof insertTodoSchema>;
 
 export default {
-  users,
-  todos
+    users,
+    todos
 };
