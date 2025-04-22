@@ -2,11 +2,11 @@
 
 import Link from "next/link"
 import { Button } from "./ui/button"
-import { useSession } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 
 export function AdminNavEntry() {
-    const { data: session } = useSession()
-    const isAdmin = session?.user?.role === "admin"
+    const { data: session } = authClient.useSession()
+    const isAdmin = (session?.user as any)?.role === "admin"
     if (!isAdmin) {
         return null
     }

@@ -8,6 +8,20 @@
       "when": 1745249677505,
       "tag": "0000_quiet_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1745341944350,
+      "tag": "0001_deep_paladin",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745343017674,
+      "tag": "0002_faithful_wither",
+      "breakpoints": true
     }
   ]
 }

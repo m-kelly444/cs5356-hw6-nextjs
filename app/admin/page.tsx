@@ -14,15 +14,18 @@ export default async function AdminPage() {
         throw new Error("BETTER_AUTH_URL is not defined")
     }
     
-    const headersList = headers()
+    const headersList = await headers()
     let session;
     try {
         const headerEntries = Object.fromEntries(headersList.entries());
-        session = await auth.api.getSession({ headers: headerEntries });
+        // Create a proper Headers object
+        const headersObj = new Headers(headerEntries)
+        session = await auth.api.getSession({ headers: headersObj });
     } catch (error) {
         console.error("Failed to get session:", error);
         return <div className="p-8">Authentication error. Please try again later.</div>;
     }
+    
     if (!session || !session.user || session.user.role !== "admin") {
         return <div className="p-8">You need admin privileges to access this page.</div>;
     }
@@ -64,6 +67,7 @@ export default async function AdminPage() {
                                     <td className="py-2 px-4">{todo.title}</td>
                                     <td className="py-2 px-4 text-center">
                                         <form action={async (formData) => {
+                                            "use server"
                                             await deleteTodo(formData)
                                         }}>
                                             <input type="hidden" name="id" value={todo.id} />

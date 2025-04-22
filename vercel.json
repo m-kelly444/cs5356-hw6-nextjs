@@ -2,13 +2,5 @@
     "framework": "nextjs",
     "buildCommand": "next build",
     "devCommand": "next dev",
-    "installCommand": "npm install",
-    "functions": {
-      "api/**/*.js": {
-        "runtime": "@vercel/node@2.15.10"
-      },
-      "middleware.js": {
-        "runtime": "@vercel/node@2.15.10"
-      }
-    }
+    "installCommand": "pnpm install"
   }

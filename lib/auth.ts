@@ -21,8 +21,29 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true
     },
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+                required: false,
+                defaultValue: "user",
+                input: false
+            }
+        }
+    },
     plugins: [
         admin(), 
         nextCookies() 
     ]
 })
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image?: string | null;
+    role?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}

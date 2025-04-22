@@ -8,8 +8,12 @@ import { db } from "@/database/db"
 import { todos } from "@/database/schema"
 
 export async function createTodo(formData: FormData) {
-    const headersList = headers()
-    const session = await auth.api.getSession({ headers: headersList })
+    const headersList = await headers()
+    const headerEntries = Object.fromEntries(headersList.entries())
+    // Create a proper Headers object
+    const headersObj = new Headers(headerEntries)
+    const session = await auth.api.getSession({ headers: headersObj })
+    
     if (!session?.user) {
         return { error: "You must be signed in to create todos" }
     }
@@ -34,8 +38,12 @@ export async function createTodo(formData: FormData) {
 }
 
 export async function toggleTodo(formData: FormData) {
-    const headersList = headers()
-    const session = await auth.api.getSession({ headers: headersList })
+    const headersList = await headers()
+    const headerEntries = Object.fromEntries(headersList.entries())
+    // Create a proper Headers object
+    const headersObj = new Headers(headerEntries)
+    const session = await auth.api.getSession({ headers: headersObj })
+    
     if (!session?.user) {
         return { error: "You must be signed in to update todos" }
     }
@@ -75,8 +83,12 @@ export async function toggleTodo(formData: FormData) {
 }
 
 export async function deleteTodo(formData: FormData) {
-    const headersList = headers()
-    const session = await auth.api.getSession({ headers: headersList })
+    const headersList = await headers()
+    const headerEntries = Object.fromEntries(headersList.entries())
+    // Create a proper Headers object
+    const headersObj = new Headers(headerEntries)
+    const session = await auth.api.getSession({ headers: headersObj })
+    
     if (!session?.user) {
         return { error: "You must be signed in to delete todos" }
     }
