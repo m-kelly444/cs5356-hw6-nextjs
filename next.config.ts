@@ -3,9 +3,8 @@ const nextConfig = {
     experimental: {
       nodeMiddleware: true,
     },
-    middleware: {
-      runtime: "nodejs"
-    }
+    // Vercel-specific settings
+    transpilePackages: ["better-auth"]
   }
   
   module.exports = nextConfig
