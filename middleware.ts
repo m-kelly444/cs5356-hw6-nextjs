@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server"
 
 const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
 
-export default async function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
     if (!BETTER_AUTH_URL) {
         throw new Error("BETTER_AUTH_URL is not defined")
     }
