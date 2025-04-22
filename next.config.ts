@@ -1,9 +1,11 @@
-import type { NextConfig } from "next"
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
     experimental: {
-        nodeMiddleware: true,
+      nodeMiddleware: true,
     },
-}
-
-export default nextConfig
+    middleware: {
+      runtime: "nodejs"
+    }
+  }
+  
+  module.exports = nextConfig
