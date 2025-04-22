@@ -14,14 +14,17 @@ export default async function AdminPage() {
         throw new Error("BETTER_AUTH_URL is not defined")
     }
     
-    const headersList = await headers()
-    const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
-        headers: Object.fromEntries(headersList.entries())
-    }))
-    const session = await sessionResponse.json()
-    
-    if (!session || session.user.role !== "admin") {
-        return null
+    const headersList = headers()
+    let session;
+    try {
+        const headerEntries = Object.fromEntries(headersList.entries());
+        session = await auth.api.getSession({ headers: headerEntries });
+    } catch (error) {
+        console.error("Failed to get session:", error);
+        return <div className="p-8">Authentication error. Please try again later.</div>;
+    }
+    if (!session || !session.user || session.user.role !== "admin") {
+        return <div className="p-8">You need admin privileges to access this page.</div>;
     }
 
     const allTodos = await db.query.todos.findMany({

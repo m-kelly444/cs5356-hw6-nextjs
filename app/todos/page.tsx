@@ -14,21 +14,19 @@ export default async function TodosPage() {
         throw new Error("BETTER_AUTH_URL is not defined")
     }
     
-    const headersList = await headers()
-    const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
-        headers: Object.fromEntries(headersList.entries())
-    }))
+    const headersList = headers()
 
     let session;
     try {
-        session = await sessionResponse.json()
+        const headerEntries = Object.fromEntries(headersList.entries());
+        session = await auth.api.getSession({ headers: headerEntries });
     } catch (error) {
-        console.error("Failed to parse session response:", error);
-        return <div>Authentication error. Please try again later.</div>
+        console.error("Failed to get session:", error);
+        return <div className="p-8">Authentication error. Please try again later.</div>;
     }
-    
-    if (!session) {
-        return <div>Please sign in to view your todos</div>
+
+    if (!session || !session.user || !session.user.id) {
+        return <div className="p-8">Please sign in to view your todos</div>
     }
     
     const userTodos = await db.query.todos.findMany({
