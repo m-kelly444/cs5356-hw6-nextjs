@@ -6,21 +6,19 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toggleTodo } from "@/actions/todos"
 
 export function TodoItem({ todo }: { todo: Todo }) {
+    const [isChecked, setIsChecked] = useState(todo.completed)
     const [isPending, setIsPending] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    async function handleToggle() {
+    const handleToggle = async () => {
+        if (isPending) return
+        setIsChecked(!isChecked)
+        setIsPending(true)
         try {
-            setIsPending(true)
-            setError(null)
-            
-            const result = await toggleTodo(todo.id)
-            
-            if (!result.success) {
-                setError(result.error || "Failed to toggle todo")
-            }
-        } catch (e) {
-            setError("An unexpected error occurred")
+            const formData = new FormData()
+            formData.append("id", todo.id)
+            await toggleTodo(formData)
+        } catch (error) {
+            console.error("Failed to toggle todo:", error)
+            setIsChecked(isChecked)
         } finally {
             setIsPending(false)
         }
@@ -28,20 +26,22 @@ export function TodoItem({ todo }: { todo: Todo }) {
 
     return (
         <li
-            key={todo.id}
-            className={`flex items-center gap-2 rounded-lg border px-4 py-2 ${isPending ? "opacity-50" : ""}`}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2 ${
+                isPending ? "opacity-70" : ""
+            }`}
         >
             <Checkbox
-                checked={todo.completed}
+                checked={isChecked}
                 onCheckedChange={handleToggle}
                 disabled={isPending}
             />
-            <span className={`flex-1 ${todo.completed ? "line-through text-muted-foreground" : ""}`}>
+            <span 
+                className={`flex-1 ${
+                    isChecked ? "line-through text-muted-foreground" : ""
+                }`}
+            >
                 {todo.title}
             </span>
-            {error && (
-                <span className="text-xs text-red-500">{error}</span>
-            )}
         </li>
     )
 }

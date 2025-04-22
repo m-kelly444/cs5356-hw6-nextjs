@@ -1,35 +1,34 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import type { NextRequest } from "next/server"
 
-const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
+export async function middleware(request: NextRequest) {
+    try {
+        const pathname = request.nextUrl.pathname
+        const headers = request.headers
+        const session = await auth.api.getSession({ headers })
 
-export async function middleware(req: NextRequest) {
-    if (!BETTER_AUTH_URL) {
-        throw new Error("BETTER_AUTH_URL is not defined")
+        if (pathname === '/todos' && !session?.user) {
+            return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+        }
+
+        if (pathname === '/admin') {
+            if (!session?.user) {
+                return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+            }
+
+            if (session.user.role !== 'admin') {
+                return NextResponse.redirect(new URL('/', request.url))
+            }
+        }
+
+        return NextResponse.next()
+    } catch (error) {
+        console.error('Middleware error:', error)
+        return NextResponse.next()
     }
-    
-    const sessionResponse = await auth.handler(new Request(BETTER_AUTH_URL, { 
-        headers: Object.fromEntries(req.headers.entries())
-    }))
-    const session = await sessionResponse.json()
-    
-    const url = req.nextUrl.clone()
-    
-    if (url.pathname.startsWith("/todos") && !session) {
-        url.pathname = "/auth/sign-in"
-        url.searchParams.set("callbackUrl", req.nextUrl.pathname)
-        return NextResponse.redirect(url)
-    }
-    
-    if (url.pathname.startsWith("/admin") && (!session || session.user.role !== "admin")) {
-        url.pathname = "/"
-        return NextResponse.redirect(url)
-    }
-    
-    return NextResponse.next()
 }
 
 export const config = {
-    matcher: ["/todos/:path*", "/admin/:path*"],
+    runtime: "nodejs",
+    matcher: ['/todos', '/admin']
 }
